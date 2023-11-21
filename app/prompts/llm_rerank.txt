@@ -1,0 +1,6 @@
+Given the provided query and search results return only the relevant results.
+Return your results as a JSON array of the <title> of each relevant result.
+Order the results in order of descending relevance
+Query: {query}
+Search Results: {results}
+Relevant Results Ranked: 

@@ -1,0 +1,475 @@
+Given the following Query, Document Metatdata, and Filter API Specification generate a Filter JSON object that
+would be useful when performing a search based on the Query.
+Query
+{query}
+---
+Document Metatdata
+{{
+    "cast": {{"type": List[str], "description": "a list of actors staring who star in the film}},
+    "directors": {{"type": List[str], "description": "a list of people who directed the film"}},
+    "genere": {{"type": str, "description": "the genere of the the film"}},
+    "origin": {{"type": str, "description": "the origin country of the movie", "options": ["American", "Australian", "Bangladeshi", "British", "Canadian", "Chinese", "Egyptian", "Hong Kong", "Filipino", "Assamese", "Bengali", "Bollywood", "Kannada", "Malayalam", "Marathi", "Punjabi", "Tamil", "Telugu", "Japanese", "Malaysian", "Maldivian", "Russian", "South_Korean", "Turkish"]}},
+    "release_year": "type": int, "description": "the year the movie was released"
+}}
+---
+Filter API Specifications
+{{"Filter": {{
+    "type": "object",
+    "properties": {{
+      "should": {{
+        "description": "At least one of those conditions should match",
+        "type": "array",
+        "items": {{
+          "$ref": "#/components/schemas/Condition"
+        }},
+        "nullable": true
+      }},
+      "must": {{
+        "description": "All conditions must match",
+        "type": "array",
+        "items": {{
+          "$ref": "#/components/schemas/Condition"
+        }},
+        "nullable": true
+      }},
+      "must_not": {{
+        "description": "All conditions must NOT match",
+        "type": "array",
+        "items": {{
+          "$ref": "#/components/schemas/Condition"
+        }},
+        "nullable": true
+      }}
+    }},
+    "additionalProperties": false
+  }},
+  "Condition": {{
+    "anyOf": [
+      {{
+        "$ref": "#/components/schemas/FieldCondition"
+      }},
+      {{
+        "$ref": "#/components/schemas/IsEmptyCondition"
+      }},
+      {{
+        "$ref": "#/components/schemas/IsNullCondition"
+      }},
+      {{
+        "$ref": "#/components/schemas/HasIdCondition"
+      }},
+      {{
+        "$ref": "#/components/schemas/NestedCondition"
+      }},
+      {{
+        "$ref": "#/components/schemas/Filter"
+      }}
+    ]
+  }},
+  "FieldCondition": {{
+    "description": "All possible payload filtering conditions",
+    "type": "object",
+    "required": [
+      "key"
+    ],
+    "properties": {{
+      "key": {{
+        "description": "Payload key",
+        "type": "string"
+      }},
+      "match": {{
+        "description": "Check if point has field with a given value",
+        "anyOf": [
+          {{
+            "$ref": "#/components/schemas/Match"
+          }},
+          {{
+            "nullable": true
+          }}
+        ]
+      }},
+      "range": {{
+        "description": "Check if points value lies in a given range",
+        "anyOf": [
+          {{
+            "$ref": "#/components/schemas/Range"
+          }},
+          {{
+            "nullable": true
+          }}
+        ]
+      }},
+      "geo_bounding_box": {{
+        "description": "Check if points geo location lies in a given area",
+        "anyOf": [
+          {{
+            "$ref": "#/components/schemas/GeoBoundingBox"
+          }},
+          {{
+            "nullable": true
+          }}
+        ]
+      }},
+      "geo_radius": {{
+        "description": "Check if geo point is within a given radius",
+        "anyOf": [
+          {{
+            "$ref": "#/components/schemas/GeoRadius"
+          }},
+          {{
+            "nullable": true
+          }}
+        ]
+      }},
+      "geo_polygon": {{
+        "description": "Check if geo point is within a given polygon",
+        "anyOf": [
+          {{
+            "$ref": "#/components/schemas/GeoPolygon"
+          }},
+          {{
+            "nullable": true
+          }}
+        ]
+      }},
+      "values_count": {{
+        "description": "Check number of values of the field",
+        "anyOf": [
+          {{
+            "$ref": "#/components/schemas/ValuesCount"
+          }},
+          {{
+            "nullable": true
+          }}
+        ]
+      }}
+    }}
+  }},
+  "Match": {{
+    "description": "Match filter request",
+    "anyOf": [
+      {{
+        "$ref": "#/components/schemas/MatchValue"
+      }},
+      {{
+        "$ref": "#/components/schemas/MatchText"
+      }},
+      {{
+        "$ref": "#/components/schemas/MatchAny"
+      }},
+      {{
+        "$ref": "#/components/schemas/MatchExcept"
+      }}
+    ]
+  }},
+  "MatchValue": {{
+    "description": "Exact match of the given value",
+    "type": "object",
+    "required": [
+      "value"
+    ],
+    "properties": {{
+      "value": {{
+        "$ref": "#/components/schemas/ValueVariants"
+      }}
+    }}
+  }},
+  "ValueVariants": {{
+    "anyOf": [
+      {{
+        "type": "string"
+      }},
+      {{
+        "type": "integer",
+        "format": "int64"
+      }},
+      {{
+        "type": "boolean"
+      }}
+    ]
+  }},
+  "MatchText": {{
+    "description": "Full-text match of the strings.",
+    "type": "object",
+    "required": [
+      "text"
+    ],
+    "properties": {{
+      "text": {{
+        "type": "string"
+      }}
+    }}
+  }},
+  "MatchAny": {{
+    "description": "Exact match on any of the given values",
+    "type": "object",
+    "required": [
+      "any"
+    ],
+    "properties": {{
+      "any": {{
+        "$ref": "#/components/schemas/AnyVariants"
+      }}
+    }}
+  }},
+  "AnyVariants": {{
+    "anyOf": [
+      {{
+        "type": "array",
+        "items": {{
+          "type": "string"
+        }}
+      }},
+      {{
+        "type": "array",
+        "items": {{
+          "type": "integer",
+          "format": "int64"
+        }}
+      }}
+    ]
+  }},
+  "MatchExcept": {{
+    "description": "Should have at least one value not matching the any given values",
+    "type": "object",
+    "required": [
+      "except"
+    ],
+    "properties": {{
+      "except": {{
+        "$ref": "#/components/schemas/AnyVariants"
+      }}
+    }}
+  }},
+  "Range": {{
+    "description": "Range filter request",
+    "type": "object",
+    "properties": {{
+      "lt": {{
+        "description": "point.key < range.lt",
+        "type": "number",
+        "format": "double",
+        "nullable": true
+      }},
+      "gt": {{
+        "description": "point.key > range.gt",
+        "type": "number",
+        "format": "double",
+        "nullable": true
+      }},
+      "gte": {{
+        "description": "point.key >= range.gte",
+        "type": "number",
+        "format": "double",
+        "nullable": true
+      }},
+      "lte": {{
+        "description": "point.key <= range.lte",
+        "type": "number",
+        "format": "double",
+        "nullable": true
+      }}
+    }}
+  }},
+  "GeoBoundingBox": {{
+    "description": "Geo filter request\n\nMatches coordinates inside the rectangle, described by coordinates of lop-left and bottom-right edges",
+    "type": "object",
+    "required": [
+      "bottom_right",
+      "top_left"
+    ],
+    "properties": {{
+      "top_left": {{
+        "$ref": "#/components/schemas/GeoPoint"
+      }},
+      "bottom_right": {{
+        "$ref": "#/components/schemas/GeoPoint"
+      }}
+    }}
+  }},
+  "GeoPoint": {{
+    "description": "Geo point payload schema",
+    "type": "object",
+    "required": [
+      "lat",
+      "lon"
+    ],
+    "properties": {{
+      "lon": {{
+        "type": "number",
+        "format": "double"
+      }},
+      "lat": {{
+        "type": "number",
+        "format": "double"
+      }}
+    }}
+  }},
+  "GeoRadius": {{
+    "description": "Geo filter request\n\nMatches coordinates inside the circle of `radius` and center with coordinates `center`",
+    "type": "object",
+    "required": [
+      "center",
+      "radius"
+    ],
+    "properties": {{
+      "center": {{
+        "$ref": "#/components/schemas/GeoPoint"
+      }},
+      "radius": {{
+        "description": "Radius of the area in meters",
+        "type": "number",
+        "format": "double"
+      }}
+    }}
+  }},
+  "GeoPolygon": {{
+    "description": "Geo filter request\n\nMatches coordinates inside the polygon, defined by `exterior` and `interiors`",
+    "type": "object",
+    "required": [
+      "exterior"
+    ],
+    "properties": {{
+      "exterior": {{
+        "$ref": "#/components/schemas/GeoLineString"
+      }},
+      "interiors": {{
+        "description": "Interior lines (if present) bound holes within the surface each GeoLineString must consist of a minimum of 4 points, and the first and last points must be the same.",
+        "type": "array",
+        "items": {{
+          "$ref": "#/components/schemas/GeoLineString"
+        }},
+        "nullable": true
+      }}
+    }}
+  }},
+  "GeoLineString": {{
+    "description": "Ordered sequence of GeoPoints representing the line",
+    "type": "object",
+    "required": [
+      "points"
+    ],
+    "properties": {{
+      "points": {{
+        "type": "array",
+        "items": {{
+          "$ref": "#/components/schemas/GeoPoint"
+        }}
+      }}
+    }}
+  }},
+  "ValuesCount": {{
+    "description": "Values count filter request",
+    "type": "object",
+    "properties": {{
+      "lt": {{
+        "description": "point.key.length() < values_count.lt",
+        "type": "integer",
+        "format": "uint",
+        "minimum": 0,
+        "nullable": true
+      }},
+      "gt": {{
+        "description": "point.key.length() > values_count.gt",
+        "type": "integer",
+        "format": "uint",
+        "minimum": 0,
+        "nullable": true
+      }},
+      "gte": {{
+        "description": "point.key.length() >= values_count.gte",
+        "type": "integer",
+        "format": "uint",
+        "minimum": 0,
+        "nullable": true
+      }},
+      "lte": {{
+        "description": "point.key.length() <= values_count.lte",
+        "type": "integer",
+        "format": "uint",
+        "minimum": 0,
+        "nullable": true
+      }}
+    }}
+  }},
+  "IsEmptyCondition": {{
+    "description": "Select points with empty payload for a specified field",
+    "type": "object",
+    "required": [
+      "is_empty"
+    ],
+    "properties": {{
+      "is_empty": {{
+        "$ref": "#/components/schemas/PayloadField"
+      }}
+    }}
+  }},
+  "PayloadField": {{
+    "description": "Payload field",
+    "type": "object",
+    "required": [
+      "key"
+    ],
+    "properties": {{
+      "key": {{
+        "description": "Payload field name",
+        "type": "string"
+      }}
+    }}
+  }},
+  "IsNullCondition": {{
+    "description": "Select points with null payload for a specified field",
+    "type": "object",
+    "required": [
+      "is_null"
+    ],
+    "properties": {{
+      "is_null": {{
+        "$ref": "#/components/schemas/PayloadField"
+      }}
+    }}
+  }},
+  "HasIdCondition": {{
+    "description": "ID-based filtering condition",
+    "type": "object",
+    "required": [
+      "has_id"
+    ],
+    "properties": {{
+      "has_id": {{
+        "type": "array",
+        "items": {{
+          "$ref": "#/components/schemas/ExtendedPointId"
+        }},
+        "uniqueItems": true
+      }}
+    }}
+  }},
+  "NestedCondition": {{
+    "type": "object",
+    "required": [
+      "nested"
+    ],
+    "properties": {{
+      "nested": {{
+        "$ref": "#/components/schemas/Nested"
+      }}
+    }}
+  }},
+  "Nested": {{
+    "description": "Select points with payload for a specified nested field",
+    "type": "object",
+    "required": [
+      "filter",
+      "key"
+    ],
+    "properties": {{
+      "key": {{
+        "type": "string"
+      }},
+      "filter": {{
+        "$ref": "#/components/schemas/Filter"
+      }}
+    }}
+  }}
+}}
+---

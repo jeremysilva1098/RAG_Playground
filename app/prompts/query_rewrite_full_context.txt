@@ -1,0 +1,8 @@
+Given the following conversation and the most recent question, 
+rephrase the follow up question to be a more informative search query given the full context of the conversation
+Chat History:
+{}
+Follow Up Question:
+{}
+Rephrased Follow Up Question:
+

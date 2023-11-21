@@ -1,0 +1,6 @@
+Provide 2 additional search queries for a movie database that expands the provided query in an effort to better answer the question.
+The database contains plot descriptions of movies.
+Return your answer as a JSON array containing the 2 query strings
+Chat History: {chat_history}
+Original Query: {query}
+Answer:

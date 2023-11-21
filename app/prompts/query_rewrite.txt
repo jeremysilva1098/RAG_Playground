@@ -1,0 +1,4 @@
+Provide a better search query for a movie database that answers the provided query.
+The database contains plot descriptions of movies.
+Original Query: {}
+Answer:
