@@ -1,10 +1,11 @@
 from pydantic import BaseModel
 from typing import List, Optional
 
+
 class SearchResult(BaseModel):
     score: float
     payload: dict
-    vector: Optional[List[float]]
+    vector: Optional[List[float]] = None
 
 class RewriteSearchResults(BaseModel):
     rewrite: str

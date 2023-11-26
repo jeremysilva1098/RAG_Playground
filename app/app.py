@@ -4,7 +4,8 @@ from chat import ChatSession
 
 app = Flask(__name__)
 chat_session = None
-sys_msg = "You are a movie expert designed to help people answer questions about movies. Sometimes you will be provided with additonal information to inform your answers"
+with open("./prompts/system_message.txt", "r") as f:
+    sys_msg = f.read()
 
 
 @app.route('/')
