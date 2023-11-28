@@ -20,3 +20,5 @@ the results in a seperate call we can avoid distracting information. The intuiti
 trying to provide multiple steps of reasoning in a single LLM call.
 ### Multi Query Search
 Involves using multiple search queries to run vector search and combining the results before passing the context to the model. You could use an LLM to generate multiple search queries or combine things like self-query and full context query rewrite together.
+
+[![Demo Video](https://i.stack.imgur.com/Vp2cE.png)](https://youtu.be/OH6Q7pBJe50)
